@@ -1,3 +1,5 @@
+
+
 <div class="search-bar w3layouts-newsletter">
     <h3 class="sear-head editContent">Поиск книги</h3>
     <form action="#" method="post" class="d-flex editContent">
@@ -8,27 +10,22 @@
     </form>
 </div>
 <!--preference -->
+<form action="{% url 'filter' %}" method="get">
 <div class="left-side my-4">
     <h3 class="sear-head editContent">Жанры</h3>
     <ul class="w3layouts-box-list">
+        {% for genre in view.get_genres %}
+
         <li class="editContent">
-            <input type="checkbox" class="checked">
-            <span class="span editContent">Повести</span>
+            <input type="checkbox" class="checked" name="genre" value="{{ genre.id }}">
+            <span class="span editContent">{{ genre.name }}</span>
         </li>
-        <li class="editContent">
-            <input type="checkbox" class="checked">
-            <span class="span editContent">Рассказы</span>
-        </li>
-        <li class="editContent">
-            <input type="checkbox" class="checked">
-            <span class="span editContent">Пьесы</span>
-        </li>
-        <li class="editContent">
-            <input type="checkbox" class="checked">
-            <span class="span editContent">Романы</span>
-        </li>
+        {% endfor %}
+
     </ul>
 </div>
+    <button type="submit">Найти</button>
+    </form>
 <!-- // preference -->
 <!-- discounts -->
 

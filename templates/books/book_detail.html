@@ -25,7 +25,8 @@
                                 </li>
                                 <li style="list-style: none">
                                     <span><b>Автор:</b>
-                                        {{ book.author }}
+                                        <a href="{% url 'author_detail' book.author %}">
+                                        {{ book.author }} </a>
 
                                     </span></li>
                                 <li style="list-style: none"><span><b>Жанр:</b> {{ book.genres }}</span>
