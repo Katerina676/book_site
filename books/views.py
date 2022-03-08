@@ -1,10 +1,11 @@
+from django.http import HttpResponse
 from django.shortcuts import redirect
 from django.views.generic import ListView, DetailView
 from django.views.generic.base import View
 from django.db.models import Q
 
-from .forms import ReviewForm
-from .models import Book, Author, Genre
+from .forms import ReviewForm, RatingForm
+from .models import Book, Author, Genre, Rating
 
 
 class GenreSidebar:
@@ -21,6 +22,11 @@ class BooksView(GenreSidebar, ListView):
 class BookDetailView(GenreSidebar, DetailView):
     model = Book
     slug_field = 'url'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['star_form'] = RatingForm()
+        return context
 
 
 class AddReview(View):
@@ -51,3 +57,26 @@ class FilterBooksView(GenreSidebar, ListView):
             Q(genres__in=self.request.GET.getlist('genre'))
         )
         return queryset
+
+
+class AddStarRating(View):
+
+    def get_client_ip(self, request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
+
+    def post(self, request):
+        form = RatingForm(request.POST)
+        if form.is_valid():
+            Rating.objects.update_or_create(
+                ip=self.get_client_ip(request),
+                book_id=int(request.POST.get("book")),
+                defaults={'star_id': int(request.POST.get("star"))}
+            )
+            return HttpResponse(status=201)
+        else:
+            return HttpResponse(status=400)

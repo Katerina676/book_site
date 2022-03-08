@@ -58,7 +58,7 @@ admin.site.register(RatingStar)
 @admin.register(Rating)
 class RatingAdmin(admin.ModelAdmin):
 
-    list_display = ('book', 'star')
+    list_display = ('book', 'star', 'ip')
 
 
 @admin.register(Reviews)
