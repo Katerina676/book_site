@@ -17,6 +17,7 @@ class BooksView(GenreSidebar, ListView):
 
     model = Book
     queryset = Book.objects.all()
+    paginate_by = 6
 
 
 class BookDetailView(GenreSidebar, DetailView):
@@ -51,12 +52,18 @@ class AuthorView(DetailView):
 
 
 class FilterBooksView(GenreSidebar, ListView):
+    paginate_by = 6
 
     def get_queryset(self):
         queryset = Book.objects.filter(
             Q(genres__in=self.request.GET.getlist('genre'))
-        )
+        ).distinct()
         return queryset
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["genre"] = ''.join([f"genre={x}&" for x in self.request.GET.getlist("genre")])
+        return context
 
 
 class AddStarRating(View):
@@ -80,3 +87,16 @@ class AddStarRating(View):
             return HttpResponse(status=201)
         else:
             return HttpResponse(status=400)
+
+
+class Search(ListView):
+
+    paginate_by = 6
+
+    def get_queryset(self):
+        return Book.objects.filter(title__icontains=self.request.GET.get("q"))
+
+    def get_context_data(self, *args, **kwargs):
+        context = super().get_context_data(*args, **kwargs)
+        context["q"] = f'q={self.request.GET.get("q")}&'
+        return context
